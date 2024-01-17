@@ -7,7 +7,7 @@ client_key = "key"
 client_secret = "secret"
 
 # Encode the client key and secret
-credentials = f"{secrets.client_key}:{secrets.client_secret}"
+credentials = f"{env_secrets.client_key}:{env_secrets.client_secret}"
 encoded_credentials = base64.b64encode(credentials.encode()).decode()
 #encoded_credentials = credentials
 

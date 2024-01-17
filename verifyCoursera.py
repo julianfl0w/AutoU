@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -8,6 +9,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
 app = Flask(__name__)
+CORS(app)  # This will enable CORS for all routes and origins
+
+# Set up Chrome options
+chrome_options = Options()
+chrome_options.add_argument("--headless")  # Runs Chrome in headless mode.
+
+# Set up the WebDriver
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
 @app.route('/verify', methods=['POST'])  # Change to POST
 def verify_url():
@@ -16,13 +25,6 @@ def verify_url():
     urls = data.get('urls')
     if not urls or not isinstance(urls, list):
         return jsonify({'error': 'Missing or invalid URL list'}), 400
-
-    # Set up Chrome options
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Runs Chrome in headless mode.
-
-    # Set up the WebDriver
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
     results = []
     for url in urls:
@@ -42,9 +44,9 @@ def verify_url():
             course_name = course_name_element.text
             print(course_name)
 
-            results.append({'url': url, 'name': name, 'course_name':course_name})
+            results.append({'name': name, 'course_name':course_name})
         except Exception as e:
-            results.append({'url': url, 'error': str(e)})
+            results.append({'error': str(e)})
 
     # Close the driver after processing all URLs
     driver.quit()

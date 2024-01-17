@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Certificate Verification</title>
+<script>
+function addURL() {
+  // Prompt the user to enter a URL
+  var urlToAdd = prompt('Please enter the Coursera certificate URL to verify:');
+  if (urlToAdd) {
+    // Send the URL to the Flask app for verification
+    fetch('http://127.0.0.1:5000/verify', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ urls: [urlToAdd] })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Print the result to the screen
+      document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+    })
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+      document.getElementById('result').textContent = error.message;
+    });
+  }
+
+  // Fetch and print the Book Of Julian data
+  fetch('https://bookofjulian.net/julian.json')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+    .then(jsonData => {
+      const curriculum = jsonData["Book Of Julian"]["Wisdom"]["Curriculum"];
+      document.getElementById('julianCurriculum').textContent = curriculum;
+    })
+    .catch(error => {
+      console.error('There has been a problem with your fetch operation:', error);
+      document.getElementById('julianCurriculum').textContent = error.message;
+    });
+}
+</script>
+</head>
+<body>
+
+<h1>Coursera Certificate Verifier</h1>
+<button onclick="addURL()">Add URL</button>
+<pre id="result"></pre>
+
+<h2>Book of Julian Curriculum</h2>
+<pre id="julianCurriculum"></pre>
+
+</body>
+</html>
